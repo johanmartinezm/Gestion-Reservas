@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(file docs/Prueba.pdf)",
+      "Bash(ls docs/*.pdf)",
+      "Bash(php --version)",
+      "Bash(php artisan *)",
+      "Bash(php -r ' *)",
+      "Bash(grep -rl \"Illuminate\\\\\\\\\\\\\\\\Support\\\\\\\\\\\\\\\\CarbonImmutable\" tests/)",
+      "Bash(./vendor/bin/pint)",
+      "Bash(curl -s -X POST http://localhost:8099/api/reservations -H \"Content-Type: application/json\" -d '{\"user_id\":2,\"service_id\":1,\"starts_at\":\"2026-08-04 10:00\"}')",
+      "Bash(curl -s -X POST http://localhost:8099/api/reservations -H \"Content-Type: application/json\" -d '{\"user_id\":2,\"service_id\":1,\"starts_at\":\"2026-08-02 10:00\"}')",
+      "Bash(curl -s \"http://localhost:8099/api/users/1/reservations?from=2026-01-01&to=2026-12-31\")",
+      "Bash(curl -s -X POST http://localhost:8099/api/reservations/1/cancel)",
+      "Bash(curl -s -X POST http://localhost:8098/api/reservations -H \"Content-Type: application/json\" -d '{\"user_id\":2,\"service_id\":1,\"starts_at\":\"2026-08-04 10:00\"}')",
+      "Bash(curl -s -X POST http://localhost:8098/api/reservations/1/cancel)",
+      "Bash(pkill -f \"artisan serve\")",
+      "Bash(curl -s http://localhost:8000/api/users/1/reservations?from=2026-01-01\\\\&to=2026-12-31)",
+      "Bash(./vendor/bin/pint tests/Feature/ConcurrencyTest.php)"
+    ]
+  }
+}
