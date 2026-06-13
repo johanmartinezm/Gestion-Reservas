@@ -4,10 +4,6 @@ Servicio HTTP (API REST) para la gestión de **creación y cancelación de reser
 de un sistema de citas, con sus reglas de negocio (horarios, anticipación,
 solapamiento, reembolsos, límites). Construido con **Laravel 13 / PHP 8.3+**.
 
-> Enunciado original en `docs/Prueba.pdf`. Planes de diseño y de pruebas en
-> [`docs/plan-api-reservas.md`](docs/plan-api-reservas.md) y
-> [`docs/plan-pruebas.md`](docs/plan-pruebas.md).
-
 ## Requisitos
 
 - PHP **8.3+** (probado en 8.4)
