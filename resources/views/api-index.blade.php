@@ -39,31 +39,26 @@
         @endforeach
     </div>
 
-    {{-- Ejemplo --}}
-    <h2 class="mb-4 mt-10 text-lg font-semibold text-white">Ejemplo</h2>
-    <div class="grid gap-4 md:grid-cols-2">
-        <pre class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4 font-mono text-[13px] leading-relaxed text-slate-300"># Crear una reserva
-curl -X POST {{ url('/api/reservations') }} \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 2,
-    "service_id": 1,
-    "starts_at": "2026-06-16 10:00"
-  }'</pre>
-        <pre class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4 font-mono text-[13px] leading-relaxed text-slate-300">// 201 Created
-{
-  "data": {
-    "id": 4,
-    "user_id": 2,
-    "service_id": 1,
-    "professional_id": 1,
-    "starts_at": "2026-06-16T10:00:00-05:00",
-    "ends_at": "2026-06-16T10:30:00-05:00",
-    "status": "active",
-    "price_cents": 3000000,
-    "refund_cents": null
-  }
-}</pre>
+    {{-- Ejemplos por endpoint --}}
+    <h2 class="mb-4 mt-10 text-lg font-semibold text-white">Ejemplos por endpoint</h2>
+    <div class="space-y-4">
+        @foreach ($examples as $ex)
+            <div class="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+                <div class="flex flex-wrap items-center gap-3 border-b border-slate-800 px-4 py-3">
+                    <span @class([
+                        'min-w-[3.25rem] rounded-md px-2.5 py-1 text-center font-mono text-xs font-bold',
+                        'bg-green-500 text-slate-950' => $ex['method'] === 'GET',
+                        'bg-blue-500 text-white' => $ex['method'] === 'POST',
+                    ])>{{ $ex['method'] }}</span>
+                    <span class="font-mono text-sm text-slate-200">{{ $ex['path'] }}</span>
+                    <span class="ml-auto text-right text-sm text-slate-400">{{ $ex['title'] }}</span>
+                </div>
+                <div class="grid md:grid-cols-2">
+                    <pre class="overflow-x-auto border-b border-slate-800 p-4 font-mono text-[13px] leading-relaxed text-slate-300 md:border-b-0 md:border-r">{{ $ex['request'] }}</pre>
+                    <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-slate-400">{{ $ex['response'] }}</pre>
+                </div>
+            </div>
+        @endforeach
     </div>
 
     {{-- Datos de ejemplo --}}
