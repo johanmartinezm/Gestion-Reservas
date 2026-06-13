@@ -55,6 +55,8 @@ php artisan test     # o: composer test
 ## Endpoints
 
 Documentación detallada con ejemplos `curl` en [`docs/api.md`](docs/api.md).
+Especificación **OpenAPI 3.1** en [`docs/openapi.yaml`](docs/openapi.yaml) y
+**colección de Postman** en [`docs/postman_collection.json`](docs/postman_collection.json).
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|

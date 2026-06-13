@@ -10,6 +10,8 @@ Documentación técnica del proyecto, dirigida al equipo de desarrollo.
 | [Arquitectura](architecture.md) | Estructura de carpetas, capas y flujo de una petición. |
 | [Base de datos](database.md) | Esquema, migraciones, modelos y convenciones de datos. |
 | [API de Reservas](api.md) | Referencia de endpoints con ejemplos `curl`. |
+| [OpenAPI 3.1](openapi.yaml) | Especificación de la API (Swagger/Insomnia/Postman). |
+| [Colección Postman](postman_collection.json) | Requests listos para importar en Postman. |
 | [Plan — API de Reservas](plan-api-reservas.md) | Plan de implementación del módulo de reservas. |
 | [Plan de pruebas](plan-pruebas.md) | Estrategia y casos de prueba. |
 | [Convenciones](conventions.md) | Estándares de código, naming, flujo de Git y PRs. |

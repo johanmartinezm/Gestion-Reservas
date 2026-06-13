@@ -3,6 +3,11 @@
 Base URL local: `http://localhost:8000/api`. Todas las respuestas son JSON.
 Sin autenticación (ver supuestos en el README).
 
+> **Especificación e importación:** disponible como [OpenAPI 3.1](openapi.yaml)
+> (importable en Swagger UI, Insomnia o Postman) y como
+> [colección de Postman](postman_collection.json) lista para usar (define la
+> variable `base_url`).
+
 ## Formato de errores
 
 Las violaciones de reglas de negocio devuelven:

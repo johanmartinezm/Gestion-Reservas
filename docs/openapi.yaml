@@ -1,0 +1,292 @@
+openapi: 3.1.0
+info:
+  title: API de Reservas
+  description: >
+    Servicio de gestión de creación y cancelación de reservas para un sistema de
+    citas. Las reglas de negocio (horario, anticipación, solapamiento, reembolsos
+    y límites) se evalúan en zona horaria America/Bogota. Sin autenticación.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api
+    description: Local
+
+paths:
+  /reservations:
+    post:
+      summary: Crear una reserva
+      operationId: createReservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReservationRequest'
+      responses:
+        '201':
+          description: Reserva creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '422':
+          $ref: '#/components/responses/DomainOrValidationError'
+
+  /reservations/{id}:
+    get:
+      summary: Ver una reserva
+      operationId: showReservation
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      responses:
+        '200':
+          description: Reserva encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /reservations/{id}/cancel:
+    post:
+      summary: Cancelar una reserva y calcular el reembolso
+      operationId: cancelReservation
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      responses:
+        '200':
+          description: Reserva cancelada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: La reserva no se puede cancelar (ya está cancelada)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainError'
+
+  /users/{id}/reservations:
+    get:
+      summary: Listar reservas de un usuario por rango de fechas
+      operationId: listUserReservations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2026-01-01'
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2026-12-31'
+      responses:
+        '200':
+          description: Lista de reservas en el rango
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Reservation'
+        '422':
+          $ref: '#/components/responses/DomainOrValidationError'
+
+  /professionals/{id}/availability:
+    get:
+      summary: Horarios libres de un profesional
+      operationId: professionalAvailability
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2026-06-16'
+        - name: service_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Slots disponibles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Availability'
+        '422':
+          $ref: '#/components/responses/DomainOrValidationError'
+
+components:
+  parameters:
+    ReservationId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    CreateReservationRequest:
+      type: object
+      required: [user_id, service_id, starts_at]
+      properties:
+        user_id:
+          type: integer
+          example: 2
+        service_id:
+          type: integer
+          example: 1
+        starts_at:
+          type: string
+          description: Fecha/hora de inicio. Sin offset se interpreta como hora de Bogotá.
+          example: '2026-06-16 10:00'
+
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 4
+        user_id:
+          type: integer
+          example: 2
+        service_id:
+          type: integer
+          example: 1
+        professional_id:
+          type: integer
+          example: 1
+        starts_at:
+          type: string
+          format: date-time
+          example: '2026-06-16T10:00:00-05:00'
+        ends_at:
+          type: string
+          format: date-time
+          example: '2026-06-16T10:30:00-05:00'
+        status:
+          type: string
+          enum: [active, cancelled]
+        price_cents:
+          type: integer
+          description: Monto a cobrar, en centavos.
+          example: 3000000
+        refund_cents:
+          type: [integer, 'null']
+          description: Monto reembolsado al cancelar, en centavos.
+          example: null
+        cancelled_at:
+          type: [string, 'null']
+          format: date-time
+          example: null
+
+    ReservationResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Reservation'
+
+    Availability:
+      type: object
+      properties:
+        professional_id:
+          type: integer
+          example: 1
+        service_id:
+          type: integer
+          example: 1
+        date:
+          type: string
+          format: date
+          example: '2026-06-16'
+        duration_minutes:
+          type: integer
+          example: 30
+        slots:
+          type: array
+          items:
+            type: string
+            format: date-time
+          example:
+            - '2026-06-16T07:00:00-05:00'
+            - '2026-06-16T07:30:00-05:00'
+
+    DomainError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Código de error estable.
+          enum:
+            - insufficient_lead_time
+            - outside_operating_hours
+            - overlapping_reservation
+            - active_reservation_limit
+            - reservation_not_cancellable
+          example: outside_operating_hours
+        message:
+          type: string
+          example: La reserva está fuera del horario de operación (lunes a sábado, 7:00–19:00, sin festivos).
+
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: The given data was invalid.
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+  responses:
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: No query results for model.
+
+    DomainOrValidationError:
+      description: Violación de regla de negocio o error de validación de forma
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/DomainError'
+              - $ref: '#/components/schemas/ValidationError'

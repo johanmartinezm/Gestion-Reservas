@@ -1,0 +1,124 @@
+{
+  "info": {
+    "name": "API de Reservas",
+    "description": "Colección para probar la API de gestión de reservas. Ajusta la variable `base_url` si es necesario.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Crear reserva",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservations",
+          "host": ["{{base_url}}"],
+          "path": ["reservations"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 2,\n  \"service_id\": 1,\n  \"starts_at\": \"2026-06-16 10:00\"\n}"
+        },
+        "description": "Crea una reserva si cumple las reglas (horario, anticipación, sin solapamiento, límite de activas)."
+      }
+    },
+    {
+      "name": "Crear reserva (error: domingo)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservations",
+          "host": ["{{base_url}}"],
+          "path": ["reservations"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 2,\n  \"service_id\": 1,\n  \"starts_at\": \"2026-06-14 10:00\"\n}"
+        },
+        "description": "Ejemplo de error 422 outside_operating_hours (14-jun-2026 es domingo)."
+      }
+    },
+    {
+      "name": "Ver reserva",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservations/1",
+          "host": ["{{base_url}}"],
+          "path": ["reservations", "1"]
+        },
+        "description": "Devuelve una reserva por ID. 404 si no existe."
+      }
+    },
+    {
+      "name": "Cancelar reserva",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/reservations/1/cancel",
+          "host": ["{{base_url}}"],
+          "path": ["reservations", "1", "cancel"]
+        },
+        "description": "Cancela una reserva y calcula el reembolso según anticipación, plan y si el servicio es no reembolsable. 409 si ya estaba cancelada."
+      }
+    },
+    {
+      "name": "Listar reservas de un usuario",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/1/reservations?from=2026-01-01&to=2026-12-31",
+          "host": ["{{base_url}}"],
+          "path": ["users", "1", "reservations"],
+          "query": [
+            { "key": "from", "value": "2026-01-01" },
+            { "key": "to", "value": "2026-12-31" }
+          ]
+        },
+        "description": "Lista las reservas del usuario cuyo inicio cae en el rango [from, to] (inclusive)."
+      }
+    },
+    {
+      "name": "Disponibilidad de un profesional",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/professionals/1/availability?date=2026-06-16&service_id=1",
+          "host": ["{{base_url}}"],
+          "path": ["professionals", "1", "availability"],
+          "query": [
+            { "key": "date", "value": "2026-06-16" },
+            { "key": "service_id", "value": "1" }
+          ]
+        },
+        "description": "Devuelve los horarios libres del profesional para la fecha y duración del servicio indicado."
+      }
+    }
+  ]
+}
