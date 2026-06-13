@@ -1,5 +1,7 @@
 # API de Reservas — Prueba Técnica
 
+[![CI](https://github.com/johanmartinezm/Gestion-Reservas/actions/workflows/ci.yml/badge.svg)](https://github.com/johanmartinezm/Gestion-Reservas/actions/workflows/ci.yml)
+
 Servicio HTTP (API REST) para la gestión de **creación y cancelación de reservas**
 de un sistema de citas, con sus reglas de negocio (horarios, anticipación,
 solapamiento, reembolsos, límites). Construido con **Laravel 13 / PHP 8.3+**.
