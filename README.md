@@ -29,15 +29,19 @@ cp .env.example .env          # Windows PowerShell: copy .env.example .env
 php artisan key:generate
 touch database/database.sqlite # PowerShell: New-Item database/database.sqlite
 php artisan migrate --seed     # crea el esquema y carga data/seed.json
+npm install                    # dependencias de frontend
+npm run build                  # compila la portada (Tailwind + Vite)
 php artisan serve              # http://localhost:8000
 ```
 
 La API queda en `http://localhost:8000/api`.
 
 > **Portada visual:** al abrir la raíz `http://localhost:8000/` se muestra una
-> página con la estructura de la API (endpoints, ejemplo de request/response,
-> datos sembrados y reglas de negocio leídas de `config/reservations.php`). Es
-> autocontenida: no requiere `npm run build`.
+> página (estilizada con **Tailwind CSS** compilado por **Vite**) con la
+> estructura de la API: endpoints, ejemplo de request/response, datos sembrados y
+> reglas de negocio leídas de `config/reservations.php`. Requiere `npm run build`
+> (o `npm run dev` para hot-reload). El atajo `composer setup` hace todo el setup
+> de una sola vez.
 
 ## Pruebas
 

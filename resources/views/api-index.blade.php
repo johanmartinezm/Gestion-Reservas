@@ -1,85 +1,48 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>API de Reservas — Gestión de Reservas</title>
-    <style>
-        :root {
-            --bg: #0f172a; --card: #1e293b; --card2: #172033; --line: #334155;
-            --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
-            --get: #22c55e; --post: #3b82f6; --warn: #f59e0b;
-            --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0; background: var(--bg); color: var(--text);
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.55;
-        }
-        .wrap { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; }
-        header { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 32px; }
-        h1 { margin: 0 0 6px; font-size: 28px; letter-spacing: -.02em; }
-        h2 { font-size: 18px; margin: 40px 0 16px; color: var(--text); }
-        .sub { color: var(--muted); margin: 0; }
-        .tags { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
-        .tag { font-size: 12px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
-        .baseurl { margin-top: 16px; font-family: var(--mono); font-size: 13px; color: var(--accent); }
-        .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-        .ep { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-top: 1px solid var(--line); }
-        .ep:first-child { border-top: 0; }
-        .method { font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 4px 9px; border-radius: 6px; min-width: 52px; text-align: center; color: #04121f; }
-        .method.GET { background: var(--get); }
-        .method.POST { background: var(--post); color: #fff; }
-        .path { font-family: var(--mono); font-size: 14px; color: var(--text); }
-        .ep .desc { color: var(--muted); margin-left: auto; font-size: 13px; text-align: right; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th, td { text-align: left; padding: 10px 14px; border-top: 1px solid var(--line); }
-        th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-        tbody tr:hover { background: var(--card2); }
-        .pill { font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
-        .pill.premium { background: rgba(245,158,11,.15); color: var(--warn); }
-        .pill.standard { background: rgba(148,163,184,.15); color: var(--muted); }
-        .pill.nr { background: rgba(239,68,68,.15); color: #f87171; }
-        pre { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 16px; overflow-x: auto; font-family: var(--mono); font-size: 13px; color: #cbd5e1; margin: 0; }
-        .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } .ep { flex-wrap: wrap; } .ep .desc { margin-left: 0; text-align: left; width: 100%; } }
-        .rules li { color: var(--muted); margin-bottom: 6px; }
-        .rules strong { color: var(--text); }
-        code { font-family: var(--mono); background: var(--card2); padding: 1px 6px; border-radius: 5px; font-size: 13px; }
-        footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
-        a { color: var(--accent); }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
-<div class="wrap">
-    <header>
-        <h1>API de Reservas</h1>
-        <p class="sub">Servicio de gestión de creación y cancelación de reservas — Laravel {{ app()->version() }} · PHP {{ PHP_VERSION }}</p>
-        <div class="tags">
-            <span class="tag">REST / JSON</span>
-            <span class="tag">SQLite</span>
-            <span class="tag">Zona horaria: {{ $config['timezone'] }}</span>
-            <span class="tag">Sin autenticación</span>
+<body class="bg-slate-950 text-slate-200 antialiased">
+<div class="mx-auto max-w-4xl px-6 py-12 md:py-16">
+
+    {{-- Header --}}
+    <header class="border-b border-slate-800 pb-6">
+        <h1 class="text-3xl font-bold tracking-tight text-white">API de Reservas</h1>
+        <p class="mt-1 text-slate-400">
+            Servicio de gestión de creación y cancelación de reservas — Laravel {{ app()->version() }} · PHP {{ PHP_VERSION }}
+        </p>
+        <div class="mt-4 flex flex-wrap gap-2">
+            @foreach (['REST / JSON', 'SQLite', 'Zona horaria: '.$config['timezone'], 'Sin autenticación'] as $tag)
+                <span class="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-400">{{ $tag }}</span>
+            @endforeach
         </div>
-        <div class="baseurl">Base URL: {{ url('/api') }}</div>
+        <p class="mt-4 font-mono text-sm text-sky-400">Base URL: {{ url('/api') }}</p>
     </header>
 
-    <h2>Endpoints</h2>
-    <div class="card">
+    {{-- Endpoints --}}
+    <h2 class="mb-4 mt-10 text-lg font-semibold text-white">Endpoints</h2>
+    <div class="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
         @foreach ($endpoints as $ep)
-            <div class="ep">
-                <span class="method {{ $ep['method'] }}">{{ $ep['method'] }}</span>
-                <span class="path">{{ $ep['path'] }}</span>
-                <span class="desc">{{ $ep['desc'] }}</span>
+            <div class="flex flex-wrap items-center gap-3 border-t border-slate-800 px-4 py-3.5 first:border-t-0 hover:bg-slate-800/40">
+                <span @class([
+                    'min-w-[3.25rem] rounded-md px-2.5 py-1 text-center font-mono text-xs font-bold',
+                    'bg-green-500 text-slate-950' => $ep['method'] === 'GET',
+                    'bg-blue-500 text-white' => $ep['method'] === 'POST',
+                ])>{{ $ep['method'] }}</span>
+                <span class="font-mono text-sm text-slate-200">{{ $ep['path'] }}</span>
+                <span class="ml-auto text-right text-sm text-slate-400">{{ $ep['desc'] }}</span>
             </div>
         @endforeach
     </div>
 
-    <h2>Ejemplo</h2>
-    <div class="grid2">
-        <div>
-            <pre># Crear una reserva
+    {{-- Ejemplo --}}
+    <h2 class="mb-4 mt-10 text-lg font-semibold text-white">Ejemplo</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+        <pre class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4 font-mono text-[13px] leading-relaxed text-slate-300"># Crear una reserva
 curl -X POST {{ url('/api/reservations') }} \
   -H "Content-Type: application/json" \
   -d '{
@@ -87,9 +50,7 @@ curl -X POST {{ url('/api/reservations') }} \
     "service_id": 1,
     "starts_at": "2026-06-16 10:00"
   }'</pre>
-        </div>
-        <div>
-            <pre>// 201 Created
+        <pre class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4 font-mono text-[13px] leading-relaxed text-slate-300">// 201 Created
 {
   "data": {
     "id": 4,
@@ -103,58 +64,84 @@ curl -X POST {{ url('/api/reservations') }} \
     "refund_cents": null
   }
 }</pre>
-        </div>
     </div>
 
+    {{-- Datos de ejemplo --}}
     @if ($users->isNotEmpty() || $services->isNotEmpty())
-        <h2>Datos de ejemplo (seed)</h2>
-        <div class="grid2">
-            <div class="card">
-                <table>
-                    <thead><tr><th>Usuario</th><th>Nombre</th><th>Plan</th></tr></thead>
-                    <tbody>
-                    @foreach ($users as $u)
-                        <tr>
-                            <td>#{{ $u->id }}</td>
-                            <td>{{ $u->name }}</td>
-                            <td><span class="pill {{ $u->plan->value }}">{{ $u->plan->value }}</span></td>
+        <h2 class="mb-4 mt-10 text-lg font-semibold text-white">Datos de ejemplo (seed)</h2>
+        <div class="grid gap-4 md:grid-cols-2">
+            <div class="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-xs uppercase tracking-wide text-slate-500">
+                            <th class="px-4 py-2.5 text-left font-semibold">Usuario</th>
+                            <th class="px-4 py-2.5 text-left font-semibold">Nombre</th>
+                            <th class="px-4 py-2.5 text-left font-semibold">Plan</th>
                         </tr>
-                    @endforeach
+                    </thead>
+                    <tbody>
+                        @foreach ($users as $u)
+                            <tr class="border-t border-slate-800 hover:bg-slate-800/40">
+                                <td class="px-4 py-2.5 text-slate-400">#{{ $u->id }}</td>
+                                <td class="px-4 py-2.5">{{ $u->name }}</td>
+                                <td class="px-4 py-2.5">
+                                    <span @class([
+                                        'rounded-full px-2 py-0.5 text-xs font-semibold',
+                                        'bg-amber-500/15 text-amber-400' => $u->plan->value === 'premium',
+                                        'bg-slate-500/15 text-slate-400' => $u->plan->value === 'standard',
+                                    ])>{{ $u->plan->value }}</span>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
-            <div class="card">
-                <table>
-                    <thead><tr><th>Servicio</th><th>Nombre</th><th>Dur.</th><th>Precio</th></tr></thead>
-                    <tbody>
-                    @foreach ($services as $s)
-                        <tr>
-                            <td>#{{ $s->id }}</td>
-                            <td>{{ $s->name }} @if($s->non_refundable)<span class="pill nr">no reemb.</span>@endif</td>
-                            <td>{{ $s->duration_minutes }}m</td>
-                            <td>${{ number_format($s->price_cents / 100, 0) }}</td>
+            <div class="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-xs uppercase tracking-wide text-slate-500">
+                            <th class="px-4 py-2.5 text-left font-semibold">Servicio</th>
+                            <th class="px-4 py-2.5 text-left font-semibold">Nombre</th>
+                            <th class="px-4 py-2.5 text-left font-semibold">Dur.</th>
+                            <th class="px-4 py-2.5 text-left font-semibold">Precio</th>
                         </tr>
-                    @endforeach
+                    </thead>
+                    <tbody>
+                        @foreach ($services as $s)
+                            <tr class="border-t border-slate-800 hover:bg-slate-800/40">
+                                <td class="px-4 py-2.5 text-slate-400">#{{ $s->id }}</td>
+                                <td class="px-4 py-2.5">
+                                    {{ $s->name }}
+                                    @if ($s->non_refundable)
+                                        <span class="ml-1 rounded-full bg-red-500/15 px-2 py-0.5 text-xs font-semibold text-red-400">no reemb.</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2.5 text-slate-400">{{ $s->duration_minutes }}m</td>
+                                <td class="px-4 py-2.5">${{ number_format($s->price_cents / 100, 0) }}</td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
         </div>
     @endif
 
-    <h2>Reglas de negocio</h2>
-    <ul class="rules">
-        <li><strong>Horario:</strong> lunes a sábado, {{ sprintf('%02d:00', $config['opening_hour']) }}–{{ sprintf('%02d:00', $config['closing_hour']) }} (hora de Bogotá). Sin domingos ni festivos de Colombia 2026.</li>
-        <li><strong>Anticipación mínima:</strong> {{ $config['minimum_lead_time_hours'] }} horas antes del inicio.</li>
-        <li><strong>Sin solapamiento</strong> entre reservas del mismo profesional.</li>
-        <li><strong>Reembolsos</strong> — Estándar: 100% (&gt;24h), 50% (24–4h), 0% (&lt;4h). Premium: 100% (&gt;4h), 50% (4–1h), 0% (&lt;1h).</li>
-        <li><strong>Servicios no reembolsables:</strong> nunca reembolsan, pero sí se pueden cancelar.</li>
-        <li><strong>Límite:</strong> máximo {{ $config['max_active_reservations'] }} reservas activas por usuario.</li>
+    {{-- Reglas --}}
+    <h2 class="mb-4 mt-10 text-lg font-semibold text-white">Reglas de negocio</h2>
+    <ul class="space-y-2 text-sm text-slate-400">
+        <li><span class="text-slate-200">Horario:</span> lunes a sábado, {{ sprintf('%02d:00', $config['opening_hour']) }}–{{ sprintf('%02d:00', $config['closing_hour']) }} (hora de Bogotá). Sin domingos ni festivos de Colombia 2026.</li>
+        <li><span class="text-slate-200">Anticipación mínima:</span> {{ $config['minimum_lead_time_hours'] }} horas antes del inicio.</li>
+        <li><span class="text-slate-200">Sin solapamiento</span> entre reservas del mismo profesional.</li>
+        <li><span class="text-slate-200">Reembolsos</span> — Estándar: 100% (&gt;24h), 50% (24–4h), 0% (&lt;4h). Premium: 100% (&gt;4h), 50% (4–1h), 0% (&lt;1h).</li>
+        <li><span class="text-slate-200">Servicios no reembolsables:</span> nunca reembolsan, pero sí se pueden cancelar.</li>
+        <li><span class="text-slate-200">Límite:</span> máximo {{ $config['max_active_reservations'] }} reservas activas por usuario.</li>
     </ul>
 
-    <footer>
-        Estado del servicio: <a href="{{ url('/up') }}">/up</a> ·
-        Documentación: <code>docs/api.md</code> ·
-        Pruebas: <code>php artisan test</code>
+    {{-- Footer --}}
+    <footer class="mt-12 border-t border-slate-800 pt-5 text-sm text-slate-500">
+        Estado del servicio: <a class="text-sky-400 hover:underline" href="{{ url('/up') }}">/up</a>
+        · Documentación: <code class="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-xs">docs/api.md</code>
+        · Pruebas: <code class="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-xs">php artisan test</code>
     </footer>
 </div>
 </body>
