@@ -61,6 +61,49 @@
         @endforeach
     </div>
 
+    {{-- Errores --}}
+    <h2 class="mb-4 mt-10 text-lg font-semibold text-white">Manejo de errores</h2>
+    <p class="mb-4 text-sm text-slate-400">
+        Las violaciones de reglas de negocio devuelven un JSON con un código de error
+        estable y el status HTTP correspondiente.
+    </p>
+    <div class="grid gap-4 md:grid-cols-2">
+        <pre class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4 font-mono text-[13px] leading-relaxed text-slate-400">// 422 Unprocessable Entity
+{
+  "error": "outside_operating_hours",
+  "message": "La reserva está fuera del
+    horario de operación (lunes a sábado,
+    7:00–19:00, sin festivos)."
+}</pre>
+        <div class="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-xs uppercase tracking-wide text-slate-500">
+                        <th class="px-4 py-2.5 text-left font-semibold">Código</th>
+                        <th class="px-4 py-2.5 text-left font-semibold">HTTP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($errorCodes as $err)
+                        <tr class="border-t border-slate-800 hover:bg-slate-800/40">
+                            <td class="px-4 py-2.5">
+                                <span class="font-mono text-xs text-rose-400">{{ $err['code'] }}</span>
+                                <span class="mt-0.5 block text-xs text-slate-500">{{ $err['desc'] }}</span>
+                            </td>
+                            <td class="px-4 py-2.5 align-top">
+                                <span class="rounded-md bg-slate-800 px-2 py-0.5 font-mono text-xs text-slate-300">{{ $err['http'] }}</span>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p class="mt-3 text-sm text-slate-500">
+        Los errores de validación de forma usan el formato estándar de Laravel
+        (<code class="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-xs">422</code> con <code class="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-xs">errors</code> por campo).
+    </p>
+
     {{-- Datos de ejemplo --}}
     @if ($users->isNotEmpty() || $services->isNotEmpty())
         <h2 class="mb-4 mt-10 text-lg font-semibold text-white">Datos de ejemplo (seed)</h2>

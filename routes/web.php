@@ -53,6 +53,14 @@ Route::get('/', function () {
         ],
     ];
 
+    $errorCodes = [
+        ['code' => 'insufficient_lead_time', 'http' => 422, 'desc' => 'Menos de 2 h de anticipación.'],
+        ['code' => 'outside_operating_hours', 'http' => 422, 'desc' => 'Domingo, festivo o fuera de 7:00–19:00.'],
+        ['code' => 'overlapping_reservation', 'http' => 422, 'desc' => 'El profesional ya está ocupado en ese rango.'],
+        ['code' => 'active_reservation_limit', 'http' => 422, 'desc' => 'El usuario ya tiene 3 reservas activas.'],
+        ['code' => 'reservation_not_cancellable', 'http' => 409, 'desc' => 'La reserva ya está cancelada.'],
+    ];
+
     // Datos sembrados (si la BD está migrada); si no, se omiten sin romper la vista.
     try {
         $users = User::query()->get(['id', 'name', 'plan']);
@@ -65,6 +73,7 @@ Route::get('/', function () {
     return view('api-index', [
         'endpoints' => $endpoints,
         'examples' => $examples,
+        'errorCodes' => $errorCodes,
         'users' => $users,
         'services' => $services,
         'config' => config('reservations'),
