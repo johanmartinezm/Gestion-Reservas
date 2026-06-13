@@ -27,6 +27,11 @@ php artisan serve              # http://localhost:8000
 
 La API queda en `http://localhost:8000/api`.
 
+> **Portada visual:** al abrir la raíz `http://localhost:8000/` se muestra una
+> página con la estructura de la API (endpoints, ejemplo de request/response,
+> datos sembrados y reglas de negocio leídas de `config/reservations.php`). Es
+> autocontenida: no requiere `npm run build`.
+
 ## Pruebas
 
 ```bash
