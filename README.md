@@ -5,6 +5,8 @@
 ![PHP](https://img.shields.io/badge/PHP-8.3+-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
 ![PHPUnit](https://img.shields.io/badge/tests-48%20passing-6DB33F?logo=php&logoColor=white)
 ![Code style: Pint](https://img.shields.io/badge/code%20style-Pint-F9322C)
 ![License](https://img.shields.io/badge/license-MIT-blue)
