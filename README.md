@@ -2,6 +2,13 @@
 
 [![CI](https://github.com/johanmartinezm/Gestion-Reservas/actions/workflows/ci.yml/badge.svg)](https://github.com/johanmartinezm/Gestion-Reservas/actions/workflows/ci.yml)
 
+![PHP](https://img.shields.io/badge/PHP-8.3+-777BB4?logo=php&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
+![PHPUnit](https://img.shields.io/badge/tests-48%20passing-6DB33F?logo=php&logoColor=white)
+![Code style: Pint](https://img.shields.io/badge/code%20style-Pint-F9322C)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
 Servicio HTTP (API REST) para la gestión de **creación y cancelación de reservas**
 de un sistema de citas, con sus reglas de negocio (horarios, anticipación,
 solapamiento, reembolsos, límites). Construido con **Laravel 13 / PHP 8.3+**.
