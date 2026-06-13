@@ -21,8 +21,8 @@ class UserReservationController extends Controller
 
         $reservations = $this->reservations->listForUser(
             $user,
-            CarbonImmutable::parse($request->validated('from'), $tz),
-            CarbonImmutable::parse($request->validated('to'), $tz),
+            CarbonImmutable::parse($request->validated('from'), $tz)->startOfDay(),
+            CarbonImmutable::parse($request->validated('to'), $tz)->endOfDay(),
         );
 
         return ReservationResource::collection($reservations);

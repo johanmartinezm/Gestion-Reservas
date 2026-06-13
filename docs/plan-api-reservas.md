@@ -1,6 +1,6 @@
 # Plan de implementación — API de Reservas (Laravel)
 
-> Estado: **ejecutado** (implementado; 43 pruebas en verde).
+> Estado: **ejecutado** (implementado; 48 pruebas en verde).
 > Fecha: 2026-06-13. Basado en la prueba técnica de `docs/Prueba.pdf`.
 > Plan de pruebas detallado en [plan-pruebas.md](plan-pruebas.md).
 > Referencia de la API en [api.md](api.md); decisión en [ADR 0002](decisions/0002-diseno-api-reservas.md).

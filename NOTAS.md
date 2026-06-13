@@ -38,4 +38,4 @@ El objetivo fue usar la IA para acelerar el trabajo mecánico (scaffolding,
 boilerplate, primera redacción) y dedicar el criterio propio a lo que la prueba
 realmente evalúa: **correctitud de las reglas, casos borde, concurrencia y
 claridad**. Todo el código fue leído, entendido y ejecutado; la suite de pruebas
-(43 casos) sirve como red de seguridad y como evidencia de las decisiones.
+(48 casos) sirve como red de seguridad y como evidencia de las decisiones.

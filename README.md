@@ -34,7 +34,7 @@ La API queda en `http://localhost:8000/api`.
 php artisan test     # o: composer test
 ```
 
-43 pruebas (unitarias + feature) sobre SQLite en memoria. Ver
+48 pruebas (unitarias + feature) sobre SQLite en memoria. Ver
 [`docs/plan-pruebas.md`](docs/plan-pruebas.md) para el mapa regla → prueba.
 
 ## Endpoints
@@ -47,6 +47,7 @@ Documentación detallada con ejemplos `curl` en [`docs/api.md`](docs/api.md).
 | `POST` | `/api/reservations/{id}/cancel` | Cancelar y calcular reembolso |
 | `GET`  | `/api/reservations/{id}` | Ver una reserva |
 | `GET`  | `/api/users/{id}/reservations?from=&to=` | Listar reservas de un usuario por rango |
+| `GET`  | `/api/professionals/{id}/availability?date=&service_id=` | Horarios libres de un profesional |
 
 ### Ejemplo rápido
 
@@ -153,13 +154,28 @@ Cada fila descartada se informa por consola al sembrar (no aborta la carga).
   es reservas; el catálogo se carga vía seed.
 - **Reprogramación** de reservas: no estaba en los requisitos.
 
+## Concurrencia
+
+La creación de reservas corre dentro de un **`Cache::lock` por profesional** (más
+`DB::transaction()`), de modo que dos peticiones para el mismo profesional se
+serializan y no pueden crear reservas solapadas ni exceder el límite, incluso en
+motores que no soportan `SELECT ... FOR UPDATE` (como SQLite). Cubierto por
+`tests/Feature/ConcurrencyTest.php`.
+
+## CI
+
+`.github/workflows/ci.yml` ejecuta en cada push/PR: instalación, **Pint** (estilo)
+y la suite de **pruebas** sobre PHP 8.4.
+
 ## Qué haría con más tiempo
 
-- Endpoint de disponibilidad (slots libres por profesional/día).
-- DTOs y respuestas de error más ricas (catálogo de códigos, i18n de mensajes).
-- Prueba de concurrencia real con dos conexiones simultáneas (hoy se cubre la ruta
-  transaccional con bloqueo; ver `docs/plan-pruebas.md`).
-- Cobertura de código y CI (GitHub Actions con Pint + tests).
+- Respuestas de error más ricas (catálogo de códigos, i18n de mensajes) y un
+  envelope estándar (problem+json).
+- Servicio ↔ profesional muchos-a-muchos (hoy es 1:1) y endpoint de reprogramación.
+- Paginación y filtros en el listado; `Idempotency-Key` al crear.
+- Análisis estático (Larastan) y reporte de cobertura.
+- Prueba de concurrencia con dos conexiones reales en paralelo (hoy se verifica la
+  invariante con el lock; ver `docs/plan-pruebas.md`).
 
 ## Transparencia sobre uso de IA
 

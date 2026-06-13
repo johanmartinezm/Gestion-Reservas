@@ -19,13 +19,12 @@ use Tests\TestCase;
 /**
  * Cubre el criterio de "concurrencia básica" del enunciado.
  *
- * Nota: SQLite en memoria con una sola conexión no permite ejecutar dos
- * peticiones realmente en paralelo, así que no simulamos hilos simultáneos.
- * Lo que sí verificamos es la INVARIANTE que protege la concurrencia: la
- * comprobación de solapamiento y de límite ocurre dentro de la transacción con
- * `lockForUpdate()`, de modo que un segundo intento sobre el mismo recurso no
- * puede crear un estado inconsistente. La prueba ejecuta los dos intentos en
- * secuencia inmediata y exige que solo uno prospere.
+ * La exclusión mutua se garantiza con un `Cache::lock` por profesional (que sí
+ * funciona aunque el motor no soporte `SELECT ... FOR UPDATE`, como SQLite) más
+ * la atomicidad de la transacción. SQLite en memoria con una sola conexión no
+ * permite ejecutar hilos realmente en paralelo, así que la prueba ejecuta los
+ * intentos en secuencia inmediata y verifica la INVARIANTE: sobre el mismo
+ * recurso, solo uno puede prosperar.
  */
 class ConcurrencyTest extends TestCase
 {

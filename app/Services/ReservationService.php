@@ -17,6 +17,7 @@ use App\Models\User;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -43,7 +44,12 @@ class ReservationService
         $this->assertSufficientLeadTime($startsAt);
         $this->assertWithinOperatingHours($startsAt, $endsAt);
 
-        return DB::transaction(function () use ($user, $service, $startsAt, $endsAt) {
+        // Lock por profesional: garantiza exclusión mutua real incluso cuando el
+        // motor no soporta SELECT ... FOR UPDATE (p. ej. SQLite). Dos peticiones
+        // para el mismo profesional se serializan; la transacción asegura atomicidad.
+        $lock = Cache::lock("reservations:professional:{$service->professional_id}", 10);
+
+        return $lock->block(5, fn () => DB::transaction(function () use ($user, $service, $startsAt, $endsAt) {
             $this->assertNoOverlap($service->professional_id, $startsAt, $endsAt);
             $this->assertUnderActiveLimit($user);
 
@@ -56,7 +62,7 @@ class ReservationService
                 'status' => ReservationStatus::Active,
                 'price_cents' => $service->price_cents,
             ]);
-        });
+        }));
     }
 
     public function cancel(Reservation $reservation): Reservation

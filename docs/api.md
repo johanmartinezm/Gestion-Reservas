@@ -94,6 +94,38 @@ curl -X POST http://localhost:8000/api/reservations/5/cancel
 
 ---
 
+## Disponibilidad de un profesional
+
+`GET /api/professionals/{id}/availability?date=YYYY-MM-DD&service_id={id}`
+
+Devuelve los horarios de inicio libres del profesional para esa fecha y la
+duración del servicio indicado, respetando horario, festivos, anticipación
+mínima y reservas existentes. Días cerrados (domingo/festivo) devuelven `slots` vacío.
+
+```bash
+curl "http://localhost:8000/api/professionals/1/availability?date=2026-06-16&service_id=1"
+```
+
+**200 OK**
+
+```json
+{
+  "data": {
+    "professional_id": 1,
+    "service_id": 1,
+    "date": "2026-06-16",
+    "duration_minutes": 30,
+    "slots": [
+      "2026-06-16T07:00:00-05:00",
+      "2026-06-16T07:30:00-05:00",
+      "2026-06-16T08:00:00-05:00"
+    ]
+  }
+}
+```
+
+---
+
 ## Listar reservas de un usuario
 
 `GET /api/users/{id}/reservations?from=YYYY-MM-DD&to=YYYY-MM-DD`

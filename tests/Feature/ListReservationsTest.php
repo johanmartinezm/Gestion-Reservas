@@ -44,6 +44,17 @@ class ListReservationsTest extends TestCase
         $response->assertOk()->assertJsonCount(1, 'data');
     }
 
+    public function test_includes_reservations_on_the_last_day_of_the_range(): void
+    {
+        $user = User::factory()->create();
+        // Reserva por la tarde del día 'to' -> debe incluirse (rango inclusivo hasta fin del día).
+        $this->reservationAt($user, '2026-07-15 16:00');
+
+        $response = $this->getJson("/api/users/{$user->id}/reservations?from=2026-07-01&to=2026-07-15");
+
+        $response->assertOk()->assertJsonCount(1, 'data');
+    }
+
     public function test_returns_empty_list_when_no_reservations_in_range(): void
     {
         $user = User::factory()->create();
