@@ -8,7 +8,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: http://localhost:8000/api
+  - url: http://localhost:8000/api/v1
     description: Local
 
 paths:
@@ -66,7 +66,7 @@ paths:
         '409':
           description: La reserva no se puede cancelar (ya está cancelada)
           content:
-            application/json:
+            application/problem+json:
               schema:
                 $ref: '#/components/schemas/DomainError'
 
@@ -241,9 +241,22 @@ components:
             - '2026-06-16T07:30:00-05:00'
 
     DomainError:
+      description: Documento problem+json (RFC 7807) para violaciones de reglas de negocio.
       type: object
       properties:
-        error:
+        type:
+          type: string
+          example: /problems/outside_operating_hours
+        title:
+          type: string
+          example: Outside Operating Hours
+        status:
+          type: integer
+          example: 422
+        detail:
+          type: string
+          example: La reserva está fuera del horario de operación (lunes a sábado, 7:00–19:00, sin festivos).
+        code:
           type: string
           description: Código de error estable.
           enum:
@@ -253,14 +266,21 @@ components:
             - active_reservation_limit
             - reservation_not_cancellable
           example: outside_operating_hours
-        message:
-          type: string
-          example: La reserva está fuera del horario de operación (lunes a sábado, 7:00–19:00, sin festivos).
 
     ValidationError:
+      description: Documento problem+json para errores de validación de forma.
       type: object
       properties:
-        message:
+        type:
+          type: string
+          example: /problems/validation
+        title:
+          type: string
+          example: Validation Failed
+        status:
+          type: integer
+          example: 422
+        detail:
           type: string
           example: The given data was invalid.
         errors:
@@ -274,18 +294,27 @@ components:
     NotFound:
       description: Recurso no encontrado
       content:
-        application/json:
+        application/problem+json:
           schema:
             type: object
             properties:
-              message:
+              type:
                 type: string
-                example: No query results for model.
+                example: /problems/not-found
+              title:
+                type: string
+                example: Not Found
+              status:
+                type: integer
+                example: 404
+              detail:
+                type: string
+                example: Recurso no encontrado.
 
     DomainOrValidationError:
       description: Violación de regla de negocio o error de validación de forma
       content:
-        application/json:
+        application/problem+json:
           schema:
             oneOf:
               - $ref: '#/components/schemas/DomainError'

@@ -1,7 +1,7 @@
 # API — Referencia de endpoints
 
-Base URL local: `http://localhost:8000/api`. Todas las respuestas son JSON.
-Sin autenticación (ver supuestos en el README).
+Base URL local: `http://localhost:8000/api/v1/v1`. Todas las respuestas son JSON.
+Sin autenticación. Rate limit: 60 peticiones/minuto por IP (ver supuestos en el README).
 
 > **Especificación e importación:** disponible como [OpenAPI 3.1](openapi.yaml)
 > (importable en Swagger UI, Insomnia o Postman) y como
@@ -10,28 +10,36 @@ Sin autenticación (ver supuestos en el README).
 
 ## Formato de errores
 
-Las violaciones de reglas de negocio devuelven:
+Los errores siguen **problem+json** (RFC 7807), con `Content-Type:
+application/problem+json`:
 
 ```json
-{ "error": "codigo_estable", "message": "Descripción legible." }
+{
+  "type": "/problems/outside_operating_hours",
+  "title": "Outside Operating Hours",
+  "status": 422,
+  "detail": "Descripción legible.",
+  "code": "outside_operating_hours"
+}
 ```
 
-| `error` | HTTP | Significado |
-|---------|------|-------------|
+| `code` | HTTP | Significado |
+|--------|------|-------------|
 | `insufficient_lead_time` | 422 | Menos de 2 h de anticipación. |
 | `outside_operating_hours` | 422 | Domingo, festivo o fuera de 07:00–19:00. |
 | `overlapping_reservation` | 422 | El profesional ya está ocupado en ese rango. |
 | `active_reservation_limit` | 422 | El usuario ya tiene 3 reservas activas. |
 | `reservation_not_cancellable` | 409 | La reserva ya está cancelada. |
 
-Los errores de validación de forma usan el formato estándar de Laravel
-(`422` con `{ "message", "errors": { campo: [...] } }`).
+Los errores de **validación de forma** también usan problem+json e incluyen un
+miembro `errors` con los detalles por campo. Los recursos inexistentes devuelven
+`404` con `type: /problems/not-found`.
 
 ---
 
 ## Crear reserva
 
-`POST /api/reservations`
+`POST /api/v1/reservations`
 
 **Body**
 
@@ -42,7 +50,7 @@ Los errores de validación de forma usan el formato estándar de Laravel
 | `starts_at` | datetime | sí | Hora local de Bogotá si no trae offset. |
 
 ```bash
-curl -X POST http://localhost:8000/api/reservations \
+curl -X POST http://localhost:8000/api/v1/reservations \
   -H "Content-Type: application/json" \
   -d '{"user_id":2,"service_id":1,"starts_at":"2026-07-14 10:00"}'
 ```
@@ -70,12 +78,12 @@ curl -X POST http://localhost:8000/api/reservations \
 
 ## Cancelar reserva
 
-`POST /api/reservations/{id}/cancel`
+`POST /api/v1/reservations/{id}/cancel`
 
 Calcula el reembolso según anticipación, plan y si el servicio es no reembolsable.
 
 ```bash
-curl -X POST http://localhost:8000/api/reservations/5/cancel
+curl -X POST http://localhost:8000/api/v1/reservations/5/cancel
 ```
 
 **200 OK**
@@ -95,20 +103,20 @@ curl -X POST http://localhost:8000/api/reservations/5/cancel
 
 ## Ver reserva
 
-`GET /api/reservations/{id}` → `200 OK` con el mismo recurso. `404` si no existe.
+`GET /api/v1/reservations/{id}` → `200 OK` con el mismo recurso. `404` si no existe.
 
 ---
 
 ## Disponibilidad de un profesional
 
-`GET /api/professionals/{id}/availability?date=YYYY-MM-DD&service_id={id}`
+`GET /api/v1/professionals/{id}/availability?date=YYYY-MM-DD&service_id={id}`
 
 Devuelve los horarios de inicio libres del profesional para esa fecha y la
 duración del servicio indicado, respetando horario, festivos, anticipación
 mínima y reservas existentes. Días cerrados (domingo/festivo) devuelven `slots` vacío.
 
 ```bash
-curl "http://localhost:8000/api/professionals/1/availability?date=2026-06-16&service_id=1"
+curl "http://localhost:8000/api/v1/professionals/1/availability?date=2026-06-16&service_id=1"
 ```
 
 **200 OK**
@@ -133,13 +141,13 @@ curl "http://localhost:8000/api/professionals/1/availability?date=2026-06-16&ser
 
 ## Listar reservas de un usuario
 
-`GET /api/users/{id}/reservations?from=YYYY-MM-DD&to=YYYY-MM-DD`
+`GET /api/v1/users/{id}/reservations?from=YYYY-MM-DD&to=YYYY-MM-DD`
 
 Filtra por `starts_at` dentro del rango `[from, to]`. Ambos parámetros son
 requeridos y `to` debe ser ≥ `from`.
 
 ```bash
-curl "http://localhost:8000/api/users/2/reservations?from=2026-07-01&to=2026-07-31"
+curl "http://localhost:8000/api/v1/users/2/reservations?from=2026-07-01&to=2026-07-31"
 ```
 
 **200 OK**

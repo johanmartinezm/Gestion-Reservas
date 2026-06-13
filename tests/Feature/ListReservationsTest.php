@@ -39,7 +39,7 @@ class ListReservationsTest extends TestCase
         $this->reservationAt($user, '2026-07-25 10:00'); // fuera
         $this->reservationAt($other, '2026-07-09 10:00'); // otro usuario
 
-        $response = $this->getJson("/api/users/{$user->id}/reservations?from=2026-07-01&to=2026-07-15");
+        $response = $this->getJson("/api/v1/users/{$user->id}/reservations?from=2026-07-01&to=2026-07-15");
 
         $response->assertOk()->assertJsonCount(1, 'data');
     }
@@ -50,7 +50,7 @@ class ListReservationsTest extends TestCase
         // Reserva por la tarde del día 'to' -> debe incluirse (rango inclusivo hasta fin del día).
         $this->reservationAt($user, '2026-07-15 16:00');
 
-        $response = $this->getJson("/api/users/{$user->id}/reservations?from=2026-07-01&to=2026-07-15");
+        $response = $this->getJson("/api/v1/users/{$user->id}/reservations?from=2026-07-01&to=2026-07-15");
 
         $response->assertOk()->assertJsonCount(1, 'data');
     }
@@ -60,7 +60,7 @@ class ListReservationsTest extends TestCase
         $user = User::factory()->create();
         $this->reservationAt($user, '2026-07-25 10:00');
 
-        $response = $this->getJson("/api/users/{$user->id}/reservations?from=2026-07-01&to=2026-07-10");
+        $response = $this->getJson("/api/v1/users/{$user->id}/reservations?from=2026-07-01&to=2026-07-10");
 
         $response->assertOk()->assertJsonCount(0, 'data');
     }
@@ -69,7 +69,7 @@ class ListReservationsTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->getJson("/api/users/{$user->id}/reservations?from=2026-07-15&to=2026-07-01");
+        $response = $this->getJson("/api/v1/users/{$user->id}/reservations?from=2026-07-15&to=2026-07-01");
 
         $response->assertStatus(422)->assertJsonValidationErrors(['to']);
     }

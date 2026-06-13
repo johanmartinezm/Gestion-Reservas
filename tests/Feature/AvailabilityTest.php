@@ -32,7 +32,7 @@ class AvailabilityTest extends TestCase
     private function query(Service $service, string $date): TestResponse
     {
         return $this->getJson(
-            "/api/professionals/{$service->professional_id}/availability?date={$date}&service_id={$service->id}"
+            "/api/v1/professionals/{$service->professional_id}/availability?date={$date}&service_id={$service->id}"
         );
     }
 

@@ -34,7 +34,8 @@ npm run build                  # compila la portada (Tailwind + Vite)
 php artisan serve              # http://localhost:8000
 ```
 
-La API queda en `http://localhost:8000/api`.
+La API queda en `http://localhost:8000/api/v1/v1` (versionada, con rate limit de
+60 req/min por IP). Los errores siguen **problem+json** (RFC 7807).
 
 > **Portada visual:** al abrir la raíz `http://localhost:8000/` se muestra una
 > página (estilizada con **Tailwind CSS** compilado por **Vite**) con la
@@ -49,7 +50,7 @@ La API queda en `http://localhost:8000/api`.
 php artisan test     # o: composer test
 ```
 
-48 pruebas (unitarias + feature) sobre SQLite en memoria. Ver
+51 pruebas (unitarias + feature) sobre SQLite en memoria. Ver
 [`docs/plan-pruebas.md`](docs/plan-pruebas.md) para el mapa regla → prueba.
 
 ## Endpoints
@@ -60,22 +61,22 @@ Especificación **OpenAPI 3.1** en [`docs/openapi.yaml`](docs/openapi.yaml) y
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| `POST` | `/api/reservations` | Crear una reserva |
-| `POST` | `/api/reservations/{id}/cancel` | Cancelar y calcular reembolso |
-| `GET`  | `/api/reservations/{id}` | Ver una reserva |
-| `GET`  | `/api/users/{id}/reservations?from=&to=` | Listar reservas de un usuario por rango |
-| `GET`  | `/api/professionals/{id}/availability?date=&service_id=` | Horarios libres de un profesional |
+| `POST` | `/api/v1/reservations` | Crear una reserva |
+| `POST` | `/api/v1/reservations/{id}/cancel` | Cancelar y calcular reembolso |
+| `GET`  | `/api/v1/reservations/{id}` | Ver una reserva |
+| `GET`  | `/api/v1/users/{id}/reservations?from=&to=` | Listar reservas de un usuario por rango |
+| `GET`  | `/api/v1/professionals/{id}/availability?date=&service_id=` | Horarios libres de un profesional |
 
 ### Ejemplo rápido
 
 ```bash
 # Crear (con los datos del seed: usuario 2, servicio 1)
-curl -X POST http://localhost:8000/api/reservations \
+curl -X POST http://localhost:8000/api/v1/reservations \
   -H "Content-Type: application/json" \
   -d '{"user_id":2,"service_id":1,"starts_at":"2026-07-14 10:00"}'
 
 # Cancelar
-curl -X POST http://localhost:8000/api/reservations/1/cancel
+curl -X POST http://localhost:8000/api/v1/reservations/1/cancel
 ```
 
 ## Reglas de negocio implementadas
@@ -138,6 +139,9 @@ en [`docs/architecture.md`](docs/architecture.md) y [`docs/database.md`](docs/da
   multi-región se almacenaría en UTC y se convertiría por usuario; aquí no aplica.
 - **Cancelación con `POST .../cancel`:** es un cambio de estado con cálculo de
   reembolso, no un borrado; por eso no uso `DELETE`.
+- **API versionada (`/api/v1`) + rate limiting** (60 req/min por IP) y errores en
+  formato **problem+json (RFC 7807)** con `type`/`title`/`status`/`detail`/`code`,
+  para un contrato de errores estable y consistente.
 
 ## Supuestos
 
@@ -182,7 +186,7 @@ motores que no soportan `SELECT ... FOR UPDATE` (como SQLite). Cubierto por
 ## CI
 
 `.github/workflows/ci.yml` ejecuta en cada push/PR: instalación, **Pint** (estilo)
-y la suite de **pruebas** sobre PHP 8.4.
+y la suite de **pruebas con cobertura** (pcov, umbral mínimo del **70%**) sobre PHP 8.4.
 
 ## Qué haría con más tiempo
 

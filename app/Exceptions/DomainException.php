@@ -6,11 +6,12 @@ namespace App\Exceptions;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 /**
- * Base de las excepciones de reglas de negocio. Se renderizan como JSON con un
- * código de error legible y un status HTTP 422 (Unprocessable Entity).
+ * Base de las excepciones de reglas de negocio. Se renderizan como un documento
+ * "problem+json" (RFC 7807) con un código de error estable y su status HTTP.
  */
 abstract class DomainException extends RuntimeException
 {
@@ -27,8 +28,11 @@ abstract class DomainException extends RuntimeException
     public function render(Request $request): JsonResponse
     {
         return response()->json([
-            'error' => $this->errorCode(),
-            'message' => $this->getMessage(),
-        ], $this->statusCode());
+            'type' => "/problems/{$this->errorCode()}",
+            'title' => Str::headline($this->errorCode()),
+            'status' => $this->statusCode(),
+            'detail' => $this->getMessage(),
+            'code' => $this->errorCode(),
+        ], $this->statusCode(), ['Content-Type' => 'application/problem+json']);
     }
 }

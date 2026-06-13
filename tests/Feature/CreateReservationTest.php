@@ -35,7 +35,7 @@ class CreateReservationTest extends TestCase
         $user = User::factory()->create();
         $service = Service::factory()->duration(60)->create();
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/api/v1/reservations', [
             'user_id' => $user->id,
             'service_id' => $service->id,
             'starts_at' => '2026-07-07 11:00',
@@ -60,13 +60,13 @@ class CreateReservationTest extends TestCase
         $user = User::factory()->create();
         $service = Service::factory()->create();
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/api/v1/reservations', [
             'user_id' => $user->id,
             'service_id' => $service->id,
             'starts_at' => '2026-07-07 09:00', // sólo 1 hora después
         ]);
 
-        $response->assertStatus(422)->assertJsonPath('error', 'insufficient_lead_time');
+        $response->assertStatus(422)->assertJsonPath('code', 'insufficient_lead_time');
     }
 
     public function test_rejects_reservation_on_sunday(): void
@@ -74,13 +74,13 @@ class CreateReservationTest extends TestCase
         $user = User::factory()->create();
         $service = Service::factory()->create();
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/api/v1/reservations', [
             'user_id' => $user->id,
             'service_id' => $service->id,
             'starts_at' => '2026-07-12 10:00', // domingo
         ]);
 
-        $response->assertStatus(422)->assertJsonPath('error', 'outside_operating_hours');
+        $response->assertStatus(422)->assertJsonPath('code', 'outside_operating_hours');
     }
 
     public function test_rejects_reservation_on_holiday(): void
@@ -88,13 +88,13 @@ class CreateReservationTest extends TestCase
         $user = User::factory()->create();
         $service = Service::factory()->create();
 
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/api/v1/reservations', [
             'user_id' => $user->id,
             'service_id' => $service->id,
             'starts_at' => '2026-07-20 10:00', // festivo (Independencia)
         ]);
 
-        $response->assertStatus(422)->assertJsonPath('error', 'outside_operating_hours');
+        $response->assertStatus(422)->assertJsonPath('code', 'outside_operating_hours');
     }
 
     public function test_rejects_overlapping_reservation_for_same_professional(): void
@@ -112,13 +112,13 @@ class CreateReservationTest extends TestCase
         ]);
 
         $user = User::factory()->create();
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/api/v1/reservations', [
             'user_id' => $user->id,
             'service_id' => $service->id,
             'starts_at' => '2026-07-07 11:30',
         ]);
 
-        $response->assertStatus(422)->assertJsonPath('error', 'overlapping_reservation');
+        $response->assertStatus(422)->assertJsonPath('code', 'overlapping_reservation');
     }
 
     public function test_rejects_when_user_exceeds_active_reservation_limit(): void
@@ -140,22 +140,41 @@ class CreateReservationTest extends TestCase
         }
 
         $service = Service::factory()->create();
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/api/v1/reservations', [
             'user_id' => $user->id,
             'service_id' => $service->id,
             'starts_at' => '2026-07-07 11:00',
         ]);
 
-        $response->assertStatus(422)->assertJsonPath('error', 'active_reservation_limit');
+        $response->assertStatus(422)->assertJsonPath('code', 'active_reservation_limit');
     }
 
     public function test_rejects_invalid_payload(): void
     {
-        $response = $this->postJson('/api/reservations', [
+        $response = $this->postJson('/api/v1/reservations', [
             'starts_at' => 'not-a-date',
         ]);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['user_id', 'service_id', 'starts_at']);
+    }
+
+    public function test_domain_errors_use_problem_json_envelope(): void
+    {
+        $user = User::factory()->create();
+        $service = Service::factory()->create();
+
+        $response = $this->postJson('/api/v1/reservations', [
+            'user_id' => $user->id,
+            'service_id' => $service->id,
+            'starts_at' => '2026-07-12 10:00', // domingo
+        ]);
+
+        $response->assertStatus(422)
+            ->assertHeader('Content-Type', 'application/problem+json')
+            ->assertJsonPath('type', '/problems/outside_operating_hours')
+            ->assertJsonPath('status', 422)
+            ->assertJsonPath('code', 'outside_operating_hours')
+            ->assertJsonStructure(['type', 'title', 'status', 'detail', 'code']);
     }
 }

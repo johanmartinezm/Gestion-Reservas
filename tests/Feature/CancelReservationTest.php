@@ -48,7 +48,7 @@ class CancelReservationTest extends TestCase
         $service = Service::factory()->create(['price_cents' => 100000]);
         $reservation = $this->reservationFor($user, $service, '2026-07-10 10:00'); // ~3 días
 
-        $response = $this->postJson("/api/reservations/{$reservation->id}/cancel");
+        $response = $this->postJson("/api/v1/reservations/{$reservation->id}/cancel");
 
         $response->assertOk()
             ->assertJsonPath('data.status', 'cancelled')
@@ -61,7 +61,7 @@ class CancelReservationTest extends TestCase
         $service = Service::factory()->nonRefundable()->create(['price_cents' => 100000]);
         $reservation = $this->reservationFor($user, $service, '2026-07-10 10:00');
 
-        $response = $this->postJson("/api/reservations/{$reservation->id}/cancel");
+        $response = $this->postJson("/api/v1/reservations/{$reservation->id}/cancel");
 
         $response->assertOk()
             ->assertJsonPath('data.status', 'cancelled')
@@ -75,7 +75,7 @@ class CancelReservationTest extends TestCase
         // ahora = 08:00; inicio 11:00 -> 3h antes (tramo premium 4h–1h = 50%)
         $reservation = $this->reservationFor($user, $service, '2026-07-07 11:00');
 
-        $response = $this->postJson("/api/reservations/{$reservation->id}/cancel");
+        $response = $this->postJson("/api/v1/reservations/{$reservation->id}/cancel");
 
         $response->assertOk()->assertJsonPath('data.refund_cents', 50000);
     }
@@ -91,14 +91,14 @@ class CancelReservationTest extends TestCase
             'price_cents' => $service->price_cents,
         ]);
 
-        $response = $this->postJson("/api/reservations/{$reservation->id}/cancel");
+        $response = $this->postJson("/api/v1/reservations/{$reservation->id}/cancel");
 
-        $response->assertStatus(409)->assertJsonPath('error', 'reservation_not_cancellable');
+        $response->assertStatus(409)->assertJsonPath('code', 'reservation_not_cancellable');
         $this->assertSame(ReservationStatus::Cancelled, $reservation->fresh()->status);
     }
 
     public function test_cancelling_a_missing_reservation_returns_404(): void
     {
-        $this->postJson('/api/reservations/999/cancel')->assertNotFound();
+        $this->postJson('/api/v1/reservations/999/cancel')->assertNotFound();
     }
 }

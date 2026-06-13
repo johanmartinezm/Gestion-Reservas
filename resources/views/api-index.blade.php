@@ -16,11 +16,11 @@
             Servicio de gestión de creación y cancelación de reservas — Laravel {{ app()->version() }} · PHP {{ PHP_VERSION }}
         </p>
         <div class="mt-4 flex flex-wrap gap-2">
-            @foreach (['REST / JSON', 'SQLite', 'Zona horaria: '.$config['timezone'], 'Sin autenticación'] as $tag)
+            @foreach (['REST / JSON', 'SQLite', 'Zona horaria: '.$config['timezone'], 'Sin autenticación', 'Rate limit: 60/min'] as $tag)
                 <span class="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-400">{{ $tag }}</span>
             @endforeach
         </div>
-        <p class="mt-4 font-mono text-sm text-sky-400">Base URL: {{ url('/api') }}</p>
+        <p class="mt-4 font-mono text-sm text-sky-400">Base URL: {{ url('/api/v1') }}</p>
     </header>
 
     {{-- Endpoints --}}
@@ -64,16 +64,20 @@
     {{-- Errores --}}
     <h2 class="mb-4 mt-10 text-lg font-semibold text-white">Manejo de errores</h2>
     <p class="mb-4 text-sm text-slate-400">
-        Las violaciones de reglas de negocio devuelven un JSON con un código de error
-        estable y el status HTTP correspondiente.
+        Las violaciones de reglas de negocio devuelven un documento
+        <code class="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-xs">application/problem+json</code>
+        (RFC 7807) con un código de error estable y su status HTTP.
     </p>
     <div class="grid gap-4 md:grid-cols-2">
-        <pre class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4 font-mono text-[13px] leading-relaxed text-slate-400">// 422 Unprocessable Entity
+        <pre class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900 p-4 font-mono text-[13px] leading-relaxed text-slate-400">// 422 · application/problem+json
 {
-  "error": "outside_operating_hours",
-  "message": "La reserva está fuera del
-    horario de operación (lunes a sábado,
-    7:00–19:00, sin festivos)."
+  "type": "/problems/outside_operating_hours",
+  "title": "Outside Operating Hours",
+  "status": 422,
+  "detail": "La reserva está fuera del horario
+    de operación (lunes a sábado, 7:00–19:00,
+    sin festivos).",
+  "code": "outside_operating_hours"
 }</pre>
         <div class="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
             <table class="w-full text-sm">
